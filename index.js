@@ -65,7 +65,9 @@ app.use("/api/user", userProtected, require("./routers/user.routes"))
 app.use("/api/open", require("./routers/open.routes"))
 
 app.use("*", (req, res) => {
-  res.status(404).json({ message: "Resource Not Found" });
+  // res.status(404).json({ message: "Resource Not Found" });
+  res.sendFile(path.join(__dirname, "dist", "index.html"))
+
 });
 
 app.use((err, req, res, next) => {
@@ -121,7 +123,7 @@ io.on("connection", (socket) => {
 
   socket.on("registerAdminMobile", () => {
     adminSocketId = socket.id
-    console.log(adminSocketId);
+    console.log("socket id",adminSocketId);
     
   });
 
