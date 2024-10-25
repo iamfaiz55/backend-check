@@ -1,0 +1,13 @@
+const multer = require("multer");
+const path = require("path");
+
+const postStorage = multer.diskStorage({
+    filename: (req, file, cb) => {
+        const fn = Date.now() + path.extname(file.originalname);
+        cb(null, fn);
+    },
+});
+
+const upload = multer({ storage: postStorage,  limits: { fileSize: 5 * 1024 * 1024 } }).array("images", 10);
+
+module.exports = upload;
