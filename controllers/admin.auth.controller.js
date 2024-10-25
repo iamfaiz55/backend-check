@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const validator = require("validator")
+const crypto= require("crypto")
 
 const { checkEmpty } = require("../utils/checkEmpty")
 const Admin = require("../models/Admin")
@@ -33,44 +34,49 @@ exports.registerAdmin = asyncHandler(async (req, res) => {
 })
 
 exports.loginAdmin = asyncHandler(async (req, res) => {
-    const { email, password } = req.body
+    const { email, password } = req.body;
 
-    const { isError, error } = checkEmpty({ email, password })
+    const { isError, error } = checkEmpty({ email, password });
     if (isError) {
-        return res.status(401).json({ message: "All Fields required", error })
+        return res.status(401).json({ message: "All Fields required", error });
     }
     if (!validator.isEmail(email)) {
-        return res.status(401).json({ message: "Invalid Email" })
+        return res.status(401).json({ message: "Invalid Email" });
     }
-    const result = await Admin.findOne({ email })
+    const result = await Admin.findOne({ email });
 
     if (!result) {
-        return res.status(401).json({ message:"Invalid Email"  })
+        return res.status(401).json({ message: "Invalid Email" });
     }
-    const isVerify = await bcrypt.compare(password, result.password)
+    const isVerify = await bcrypt.compare(password, result.password);
 
     if (!isVerify) {
-        return res.status(401).json({ message:"Invalid Password"  })
+        return res.status(401).json({ message: "Invalid Password" });
     }
 
-    const otp = Math.floor(10000 + Math.random() * 900000)
+    // Generate a 4-digit OTP
+    const otp = crypto.randomInt(1000, 10000); 
 
-    await Admin.findByIdAndUpdate(result._id, { otp })
+    await Admin.findByIdAndUpdate(result._id, { otp });
 
     await sendEmail({
         to: email,
         subject: `Login OTP`,
         message: `
             <h1>Do Not Share Your Account OTP</h1>
-            <p>your login otp ${otp}</p>
-        ` })
-     // send also to mobile👇
-    //  /////////////////////////////////////
+            <p>Your login OTP is ${otp}</p>
+        `
+    });
+    // Optionally send to mobile (you can add your SMS sending logic here)
 
-    res.json({ message: "Credentials Verify Success. OTP send to your registered email.", result:{
-        email
-    } })
-})
+    res.json({
+        message: "Credentials Verify Success. OTP sent to your registered email.",
+        result: {
+            email
+        }
+    });
+});
+
 
 exports.verifyOTP = asyncHandler(async (req, res) => {
     const { otp, email } = req.body
