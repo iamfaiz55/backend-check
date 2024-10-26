@@ -16,7 +16,7 @@ require("dotenv").config()
 
 const app = express()
 const server = http.createServer(app)
-
+let adminSocketId = null; 
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => {
@@ -27,6 +27,7 @@ mongoose
   });
 app.use((req, res, next) => {
     req.io = io
+    req.adminId = adminSocketId;
     next()
 });
   
@@ -90,10 +91,7 @@ function removeUserBySocketId(socketId) {
 function isUserOnline(userId) {
   return onlineUsers.some(user => user.userId === userId);
 }
-app.use((req, res, next) => {
-  req.adminId = adminSocketId;
-  next();
-});
+
 io.on("connection", (socket) => {
   // console.log("A user connected:", socket.id);
 
@@ -119,7 +117,7 @@ io.on("connection", (socket) => {
 // ------------------------------------------------------------------------------
 
 
-  let adminSocketId = null; 
+
 
   socket.on("registerAdminMobile", () => {
     adminSocketId = socket.id
