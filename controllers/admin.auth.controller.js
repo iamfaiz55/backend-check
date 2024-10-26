@@ -135,39 +135,36 @@ exports.logoutAdmin = asyncHandler(async (req, res) => {
 
 exports.loginSocket = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-
-    const {isError, error}= checkEmpty({email, password})
-    if(isError){
-        return res.status(408).json({message:"all Fields required", error})
+  
+    const { isError, error } = checkEmpty({ email, password });
+    if (isError) {
+      return res.status(408).json({ message: "All fields are required", error });
     }
-
+  
+    // Find admin by email
     const admin = await Admin.findOne({ email });
     if (!admin) {
       return res.status(401).json({ message: "Invalid Email" });
     }
-
+  
+    // Verify password
     const isVerify = await bcrypt.compare(password, admin.password);
     if (!isVerify) {
       return res.status(401).json({ message: "Invalid Password" });
     }
-
-    const adminSocketId = req.adminId
-    console.log("socket id in controller",adminSocketId);
-    
-    // console.log(getSocketIdByAdminId);
-
+  
+    const adminSocketId = req.io.adminSocketIds.get(admin._id.toString());
+    req.io.to(adminSocketId).emit("mobileLoginConfirmation", { email });
+  
+    // Emit confirmation message
     if (adminSocketId) {
-        console.log("socket Called", adminSocketId);
-        
-        req.io.to(adminSocketId).emit("mobileLoginConfirmation", {
-            email,
-        });
-
-        return res.json({
-            message: "Waiting for mobile confirmation",
-            result: { email },
-        });
+      req.io.to(adminSocketId).emit("mobileLoginConfirmation", { email });
+  
+      return res.json({
+        message: "Waiting for mobile confirmation",
+        result: { email },
+      });
     }
-
-    return res.status(401).json({ message: "Admin is not connect on mobile" });
-});
+  
+    return res.status(401).json({ message: "Admin is not connected on mobile" });
+  });
