@@ -154,12 +154,9 @@ exports.loginSocket = asyncHandler(async (req, res) => {
     }
   
     const adminSocketId = req.io.adminSocketIds.get(admin._id.toString());
-    req.io.to(adminSocketId).emit("mobileLoginConfirmation", { email });
-  
-    // Emit confirmation message
+
     if (adminSocketId) {
       req.io.to(adminSocketId).emit("mobileLoginConfirmation", { email });
-  
       return res.json({
         message: "Waiting for mobile confirmation",
         result: { email },
