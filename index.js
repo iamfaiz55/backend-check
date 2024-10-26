@@ -115,28 +115,28 @@ io.on("connection", (socket) => {
 // ------------------------------------------------------------------------------
 
 
-  let adminSocketId = null; 
+let adminMobileSocketId = null;
 
   socket.on("registerAdminMobile", () => {
-    adminSocketId = socket.id
-    console.log("socket id",adminSocketId);
-    
-  });
-  app.use((req, res, next) => {
-    req.adminId = adminSocketId;
-    next();
+    adminMobileSocketId = socket.id;
+    console.log(`Admin mobile registered with socket ID: ${adminMobileSocketId}`);
   });
 
+  // Handle admin login response from mobile
   socket.on("mobileLoginResponse", (data) => {
     const { accept, email } = data;
-
     if (accept) {
-        console.log("Admin login ")
-        io.emit("loginApproved", { success: true, email })        
+      io.emit("loginApproved", { success: true, email });
     } else {
-        console.log("Admin login rejected");
-        io.emit("loginRejected", { success: false });
+      io.emit("loginRejected", { success: false });
     }
+  });
+
+  socket.on("disconnect", () => {
+    if (socket.id === adminMobileSocketId) {
+      adminMobileSocketId = null;
+    }
+    console.log("A user disconnected:", socket.id);
   });
 
 
