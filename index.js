@@ -76,7 +76,7 @@ app.use((err, req, res, next) => {
 });
 const io = socketIO(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "*",
     credentials: true,
   },
 });
