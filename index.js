@@ -35,7 +35,7 @@ app.use(express.json())
 app.use(express.static("dist"))
 app.use(
   cors({
-    origin: "*",
+    origin: "https://backend-check-nu0n.onrender.com",
     credentials: true,
   })
 );
@@ -76,7 +76,7 @@ app.use((err, req, res, next) => {
 });
 const io = socketIO(server, {
   cors: {
-    origin: "*",
+    origin: "https://backend-check-nu0n.onrender.com",
     credentials: true,
   },
 });
