@@ -76,8 +76,8 @@ app.use((err, req, res, next) => {
 });
 const io = socketIO(server, {
   cors: {
-    origin: "https://backend-check-nu0n.onrender.com",
-    credentials: true,
+    origin: "*",
+    // credentials: true,
   },
 });
 
@@ -125,7 +125,7 @@ io.on("connection", (socket) => {
     adminSocketId = socket.id
     console.log("socket id",adminSocketId);
     
-  });
+  });   
   app.use((req, res, next) => {
     req.adminId = adminSocketId;
     next();
