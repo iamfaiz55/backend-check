@@ -126,6 +126,10 @@ io.on("connection", (socket) => {
     console.log("socket id",adminSocketId);
     
   });
+  app.use((req, res, next) => {
+    req.adminId = adminSocketId;
+    next();
+  });
 
   socket.on("mobileLoginResponse", (data) => {
     const { accept, email } = data;

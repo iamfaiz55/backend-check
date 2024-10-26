@@ -152,7 +152,7 @@ exports.loginSocket = asyncHandler(async (req, res) => {
     }
 
     const adminSocketId = req.adminId
-    console.log(adminSocketId);
+    console.log("socket id in controller",adminSocketId);
     
     // console.log(getSocketIdByAdminId);
 
