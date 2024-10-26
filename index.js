@@ -81,7 +81,9 @@ const io = socketIO(server, {
 let onlineUsers = [];
 
 function removeUserBySocketId(socketId) {
-  onlineUsers = onlineUsers.filter(user => user.socketId !== socketId);
+  if(onlineUsers){
+    onlineUsers = onlineUsers.filter(user => user.socketId !== socketId);
+  }
 }
 
 function isUserOnline(userId) {
