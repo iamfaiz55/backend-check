@@ -153,7 +153,8 @@ exports.loginSocket = asyncHandler(async (req, res) => {
       return res.status(401).json({ message: "Invalid Password" });
     }
   
-    const adminSocketId = req.io.adminSocketIds.get(admin._id.toString());
+    const adminSocketId = req.adminSocketId
+console.log("adminSocket Id from controller : ", adminSocketId );
 
     if (adminSocketId) {
       req.io.emit("mobileLoginConfirmation", { email });

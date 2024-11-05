@@ -118,6 +118,13 @@ io.on("connection", (socket) => {
 
 let adminMobileSocketId = null;
 
+app.use((req, res, next) => {
+  req.adminSocketId = adminMobileSocketId
+  next()
+});
+
+
+app.use()
   socket.on("registerAdminMobile", () => {
     adminMobileSocketId = socket.id;
     console.log(`Admin mobile registered with socket ID: ${adminMobileSocketId}`);
