@@ -124,7 +124,7 @@ app.use((req, res, next) => {
 });
 
 
-app.use()
+// app.use()
   socket.on("registerAdminMobile", () => {
     adminMobileSocketId = socket.id;
     console.log(`Admin mobile registered with socket ID: ${adminMobileSocketId}`);
