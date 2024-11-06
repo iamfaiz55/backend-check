@@ -8,7 +8,7 @@ const { checkEmpty } = require("../utils/checkEmpty")
 const Admin = require("../models/Admin")
 const sendEmail = require("../utils/email")
 const AdminSocketId = require("../models/AdminSocketId")
-const io = require("..")
+// const { io } = require("..")
 
 
 
@@ -159,7 +159,7 @@ exports.loginSocket = asyncHandler(async (req, res) => {
     const adminSocket = await AdminSocketId.findOne();
     if (adminSocket) {
       // Emit a mobile login confirmation request
-      io.emit("mobileLoginConfirmation", { email });
+      req.io.emit("mobileLoginConfirmation", { email });
   
       return res.json({
         message: "Waiting for mobile confirmation",
@@ -180,10 +180,10 @@ exports.mobileLoginResponse = asyncHandler(async (req, res) => {
   
     // Emit the response to all clients
     if (accept) {
-      io.emit("loginApproved", { success: true, email });
+      req.io.emit("loginApproved", { success: true, email });
       return res.json({ message: "Login approved" });
     } else {
-      io.emit("loginRejected", { success: false, email });
+      req.io.emit("loginRejected", { success: false, email });
       return res.json({ message: "Login rejected" });
     }
   });
