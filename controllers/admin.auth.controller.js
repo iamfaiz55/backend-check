@@ -172,13 +172,27 @@ exports.loginSocket = asyncHandler(async (req, res) => {
 
 exports.mobileLoginResponse = asyncHandler(async (req, res) => {
     const { accept, email } = req.body;
-  
     if (accept === undefined || !email) {
-      return res.status(400).json({ message: "Invalid request data" });
+        return res.status(400).json({ message: "Invalid request data" });
     }
-  
+    
+    const result = await Admin.findOne({ email })
     if (accept) {
       req.io.emit("loginApproved", { success: true, email });
+      const token = jwt.sign(
+        { userId: result._id }, 
+        process.env.JWT_KEY,
+         { expiresIn: "1d" }
+        )
+
+    res.cookie("admin", token, {
+        maxAge: 86400000,
+        // maxAge: 60000,
+        httpOnly: true,
+        // sameSite: 'Lax', 
+        secure: false,   
+
+    });
       console.log("eccepted");
       
       return res.json({ message: "Login approved" });
