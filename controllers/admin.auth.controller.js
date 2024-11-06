@@ -8,6 +8,7 @@ const { checkEmpty } = require("../utils/checkEmpty")
 const Admin = require("../models/Admin")
 const sendEmail = require("../utils/email")
 const AdminSocketId = require("../models/AdminSocketId")
+const io = require("../socket")
 
 
 
@@ -137,9 +138,9 @@ exports.logoutAdmin = asyncHandler(async (req, res) => {
 exports.loginSocket = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
   
-    const { isError, error } = checkEmpty({ email, password });
-    if (isError) {
-      return res.status(408).json({ message: "All fields are required", error });
+    // Check for empty fields
+    if (!email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
     }
   
     // Find admin by email
@@ -154,14 +155,12 @@ exports.loginSocket = asyncHandler(async (req, res) => {
       return res.status(401).json({ message: "Invalid Password" });
     }
   
-    const adminSocketId = await AdminSocketId.find() 
-if(adminSocketId){
-    console.log("adminSocket Id from controller : ", adminSocketId );
-}
-
-
-    if (adminSocketId) {
-      req.io.emit("mobileLoginConfirmation", { email });
+    // Find the AdminSocketId (mobile device connection)
+    const adminSocket = await AdminSocketId.findOne();
+    if (adminSocket) {
+      // Emit a mobile login confirmation request
+      io.to(adminSocket.id).emit("mobileLoginConfirmation", { email });
+  
       return res.json({
         message: "Waiting for mobile confirmation",
         result: { email },

@@ -128,27 +128,25 @@ io.on("connection", (socket) => {
 
 
 
-  socket.on("registerAdminMobile", async() => {
-    try {
-      const existingAdminSocket = await AdminSocketId.findOne();
-  
-      console.log("Current socket ID:", socket.id);
-  
-      if (!existingAdminSocket) {
-        await AdminSocketId.create({ id: socket.id });
-        console.log("Admin Socket ID created:", socket.id);
-      } else {
-        await AdminSocketId.findByIdAndUpdate(existingAdminSocket._id, { id: socket.id });
-        console.log("Admin Socket ID updated:", socket.id);
-      }
-    } catch (error) {
-      console.error("Error registering admin mobile:", error);
-    }
-  });
+socket.on("registerAdminMobile", async () => {
+  try {
+    let adminSocket = await AdminSocketId.findOne();
 
+    if (!adminSocket) {
+      adminSocket = await AdminSocketId.create({ id: socket.id });
+      console.log("Admin mobile socket registered:", socket.id);
+    } else {
+      await AdminSocketId.findByIdAndUpdate(adminSocket._id, { id: socket.id });
+      console.log("Admin mobile socket updated:", socket.id);
+    }
+  } catch (error) {
+    console.error("Error registering admin mobile:", error);
+  }
+});
   // Handle admin login response from mobile
   socket.on("mobileLoginResponse", (data) => {
     const { accept, email } = data;
+
     if (accept) {
       io.emit("loginApproved", { success: true, email });
     } else {
@@ -156,13 +154,10 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("disconnect", () => {
-    // await AdminSocketId.deleteMany()
-
-    // if (socket.id === adminMobileSocketId) {
-    //   adminMobileSocketId = null;
-    // }
-    // console.log("A user disconnected:", socket.id);
+  // Remove the socket ID on disconnect
+  socket.on("disconnect", async () => {
+    await AdminSocketId.deleteOne({ id: socket.id });
+    console.log("Admin mobile socket disconnected:", socket.id);
   });
 
 
