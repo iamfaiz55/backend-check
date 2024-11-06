@@ -130,8 +130,10 @@ io.on("connection", (socket) => {
    const  x  = await AdminSocketId.find();
     if(!x){
       await AdminSocketId.create({id:socket.id})
+      console.log("admin Socket ID cretaed");
     }
     await AdminSocketId.findByIdAndUpdate(x[0]._id, {id:socket.id})
+    console.log("admin Socket ID Updated");
     
     // console.log(`Admin mobile registered with socket ID: ${adminMobileSocketId}`);
   });
