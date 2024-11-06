@@ -155,7 +155,9 @@ exports.loginSocket = asyncHandler(async (req, res) => {
     }
   
     const adminSocketId = await AdminSocketId.find() 
-     console.log("adminSocket Id from controller : ", adminSocketId[0].id );
+if(adminSocketId){
+    console.log("adminSocket Id from controller : ", adminSocketId[0].id );
+}
 
 
     if (adminSocketId) {
