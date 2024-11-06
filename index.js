@@ -116,49 +116,8 @@ io.on("connection", (socket) => {
 
     io.emit("onlineUsers", onlineUsers);
   });
-// ------------------------------------------------------------------------------
 
 
-// let adminMobileSocketId = null;
-
-// app.use((req, res, next) => {
-//   req.adminSocketId = adminMobileSocketId
-//   next()
-// });
-
-
-
-socket.on("registerAdminMobile", async () => {
-  try {
-    let adminSocket = await AdminSocketId.findOne();
-
-    if (!adminSocket) {
-      adminSocket = await AdminSocketId.create({ id: socket.id });
-      console.log("Admin mobile socket registered:", socket.id);
-    } else {
-      await AdminSocketId.findByIdAndUpdate(adminSocket._id, { id: socket.id });
-      console.log("Admin mobile socket updated:", socket.id);
-    }
-  } catch (error) {
-    console.error("Error registering admin mobile:", error);
-  }
-});
-  // Handle admin login response from mobile
-  socket.on("mobileLoginResponse", (data) => {
-    const { accept, email } = data;
-
-    if (accept) {
-      io.emit("loginApproved", { success: true, email });
-    } else {
-      io.emit("loginRejected", { success: false });
-    }
-  });
-
-  // Remove the socket ID on disconnect
-  socket.on("disconnect", async () => {
-    await AdminSocketId.deleteOne({ id: socket.id });
-    console.log("Admin mobile socket disconnected:", socket.id);
-  });
 
 
 });
@@ -171,3 +130,4 @@ mongoose.connection.once("open", () => {
   });
 });
 
+module.exports = io; 

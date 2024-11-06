@@ -8,7 +8,7 @@ const { checkEmpty } = require("../utils/checkEmpty")
 const Admin = require("../models/Admin")
 const sendEmail = require("../utils/email")
 const AdminSocketId = require("../models/AdminSocketId")
-const io = require("../socket")
+const io = require("..")
 
 
 
@@ -169,3 +169,22 @@ exports.loginSocket = asyncHandler(async (req, res) => {
   
     return res.status(401).json({ message: "Admin is not connected on mobile" });
   });
+
+  // admin.controller.js
+exports.mobileLoginResponse = asyncHandler(async (req, res) => {
+    const { accept, email } = req.body;
+  
+    if (accept === undefined || !email) {
+      return res.status(400).json({ message: "Invalid request data" });
+    }
+  
+    // Emit the response to all clients
+    if (accept) {
+      io.emit("loginApproved", { success: true, email });
+      return res.json({ message: "Login approved" });
+    } else {
+      io.emit("loginRejected", { success: false, email });
+      return res.json({ message: "Login rejected" });
+    }
+  });
+  
