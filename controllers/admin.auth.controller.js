@@ -7,6 +7,7 @@ const crypto= require("crypto")
 const { checkEmpty } = require("../utils/checkEmpty")
 const Admin = require("../models/Admin")
 const sendEmail = require("../utils/email")
+const AdminSocketId = require("../models/AdminSocketId")
 
 
 
@@ -153,8 +154,9 @@ exports.loginSocket = asyncHandler(async (req, res) => {
       return res.status(401).json({ message: "Invalid Password" });
     }
   
-    const adminSocketId = req.adminSocketId
-console.log("adminSocket Id from controller : ", adminSocketId );
+    const adminSocketId = await AdminSocketId.find() 
+    //  console.log("adminSocket Id from controller : ", adminSocketId );
+
 
     if (adminSocketId) {
       req.io.emit("mobileLoginConfirmation", { email });

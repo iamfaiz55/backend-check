@@ -11,6 +11,7 @@ const useragent = require("express-useragent")
 const { adminProtected } = require("./middlewares/admin.protected")
 const { userProtected } = require("./middlewares/userProtected")
 const User = require("./models/User")
+const AdminSocketId = require("./models/AdminSocketId")
 
 require("dotenv").config()
 
@@ -81,13 +82,13 @@ const io = socketIO(server, {
 
 let onlineUsers = [];
 
-function removeUserBySocketId(socketId) {
+const removeUserBySocketId = (socketId)=> {
   if(onlineUsers){
     onlineUsers = onlineUsers.filter(user => user.socketId !== socketId);
   }
 }
 
-function isUserOnline(userId) {
+const isUserOnline = (userId)=> {
   return onlineUsers.some(user => user.userId === userId);
 }
 
@@ -116,18 +117,23 @@ io.on("connection", (socket) => {
 // ------------------------------------------------------------------------------
 
 
-let adminMobileSocketId = null;
+// let adminMobileSocketId = null;
 
-app.use((req, res, next) => {
-  req.adminSocketId = adminMobileSocketId
-  next()
-});
+// app.use((req, res, next) => {
+//   req.adminSocketId = adminMobileSocketId
+//   next()
+// });
 
 
-// app.use()
-  socket.on("registerAdminMobile", () => {
-    adminMobileSocketId = socket.id;
-    console.log(`Admin mobile registered with socket ID: ${adminMobileSocketId}`);
+
+  socket.on("registerAdminMobile", async() => {
+   const  x  = await AdminSocketId.find();
+    if(!x){
+      await AdminSocketId.create({id:socket.id})
+    }
+    await AdminSocketId.findByIdAndUpdate(x[0]._id, {id:socket.id})
+    
+    // console.log(`Admin mobile registered with socket ID: ${adminMobileSocketId}`);
   });
 
   // Handle admin login response from mobile
@@ -140,10 +146,12 @@ app.use((req, res, next) => {
     }
   });
 
-  socket.on("disconnect", () => {
-    if (socket.id === adminMobileSocketId) {
-      adminMobileSocketId = null;
-    }
+  socket.on("disconnect",async () => {
+    await AdminSocketId.deleteMany()
+
+    // if (socket.id === adminMobileSocketId) {
+    //   adminMobileSocketId = null;
+    // }
     console.log("A user disconnected:", socket.id);
   });
 
