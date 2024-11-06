@@ -135,11 +135,9 @@ io.on("connection", (socket) => {
       console.log("Current socket ID:", socket.id);
   
       if (!existingAdminSocket) {
-        // No record exists, so create a new one
         await AdminSocketId.create({ id: socket.id });
         console.log("Admin Socket ID created:", socket.id);
       } else {
-        // Record exists, so update it with the new socket ID
         await AdminSocketId.findByIdAndUpdate(existingAdminSocket._id, { id: socket.id });
         console.log("Admin Socket ID updated:", socket.id);
       }
@@ -158,13 +156,13 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("disconnect",async () => {
-    await AdminSocketId.deleteMany()
+  socket.on("disconnect", () => {
+    // await AdminSocketId.deleteMany()
 
     // if (socket.id === adminMobileSocketId) {
     //   adminMobileSocketId = null;
     // }
-    console.log("A user disconnected:", socket.id);
+    // console.log("A user disconnected:", socket.id);
   });
 
 
