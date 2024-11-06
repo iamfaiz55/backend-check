@@ -129,17 +129,23 @@ io.on("connection", (socket) => {
 
 
   socket.on("registerAdminMobile", async() => {
-   const  x  = await AdminSocketId.find();
-   console.log(socket.id);
-   
-    if(!x){
-      await AdminSocketId.create({id:socket.id})
-      console.log("admin Socket ID cretaed", socket.id);
+    try {
+      const existingAdminSocket = await AdminSocketId.findOne();
+  
+      console.log("Current socket ID:", socket.id);
+  
+      if (!existingAdminSocket) {
+        // No record exists, so create a new one
+        await AdminSocketId.create({ id: socket.id });
+        console.log("Admin Socket ID created:", socket.id);
+      } else {
+        // Record exists, so update it with the new socket ID
+        await AdminSocketId.findByIdAndUpdate(existingAdminSocket._id, { id: socket.id });
+        console.log("Admin Socket ID updated:", socket.id);
+      }
+    } catch (error) {
+      console.error("Error registering admin mobile:", error);
     }
-    await AdminSocketId.findByIdAndUpdate(x[0]._id, {id:socket.id})
-    console.log("admin Socket ID Updated", socket.id);
-    
-    // console.log(`Admin mobile registered with socket ID: ${adminMobileSocketId}`);
   });
 
   // Handle admin login response from mobile
