@@ -170,7 +170,6 @@ exports.loginSocket = asyncHandler(async (req, res) => {
     return res.status(401).json({ message: "Admin is not connected on mobile" });
   });
 
-  // admin.controller.js
 exports.mobileLoginResponse = asyncHandler(async (req, res) => {
     const { accept, email } = req.body;
   
@@ -178,12 +177,14 @@ exports.mobileLoginResponse = asyncHandler(async (req, res) => {
       return res.status(400).json({ message: "Invalid request data" });
     }
   
-    // Emit the response to all clients
     if (accept) {
       req.io.emit("loginApproved", { success: true, email });
+      console.log("eccepted");
+      
       return res.json({ message: "Login approved" });
     } else {
-      req.io.emit("loginRejected", { success: false, email });
+        req.io.emit("loginRejected", { success: false, email });
+        console.log("Rejected");
       return res.json({ message: "Login rejected" });
     }
   });
