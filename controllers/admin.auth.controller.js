@@ -187,18 +187,19 @@ exports.mobileLoginResponse = asyncHandler(async (req, res) => {
 
     res.cookie("admin", token, {
         maxAge: 86400000,
-        // maxAge: 60000,
+        expires: new Date(Date.now() + 86400000),
+        
         httpOnly: true,
         // sameSite: 'Lax', 
         secure: false,   
 
     });
-      console.log("eccepted");
+    //   console.log("eccepted");
       
       return res.json({ message: "Login approved" });
     } else {
         req.io.emit("loginRejected", { success: false, email });
-        console.log("Rejected");
+        // console.log("Rejected");
       return res.json({ message: "Login rejected" });
     }
   });
