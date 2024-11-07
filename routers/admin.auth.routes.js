@@ -9,5 +9,6 @@ router
    .post("/mobile-login-response", authController.mobileLoginResponse)
 
     .post("/login-socket", authController.loginSocket)
+    .post("/create-token", authController.createTokenForNotification)
 
 module.exports = router

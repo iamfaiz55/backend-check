@@ -14,6 +14,9 @@ const userSchema = new mongoose.Schema({
     email:{
         type:String,
     },
+    fcmToken:{
+        type:String,
+    },
     image:{
         type:String,
         default:"https://static.vecteezy.com/system/resources/previews/027/990/875/non_2x/royal-frame-logo-generative-ai-free-png.png"

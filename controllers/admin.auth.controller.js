@@ -9,7 +9,7 @@ const Admin = require("../models/Admin")
 const sendEmail = require("../utils/email")
 const AdminSocketId = require("../models/AdminSocketId")
 // const { io } = require("..")
-
+const firebaseAdmin = require('firebase-admin');
 
 
 
@@ -165,25 +165,88 @@ exports.loginSocket = asyncHandler(async (req, res) => {
     return res.status(401).json({ message: "Admin is not connected on mobile" });
   });
 
-exports.mobileLoginResponse = asyncHandler(async (req, res) => {
-    const { accept, email } = req.body;
-    if (accept === undefined || !email) {
-        return res.status(400).json({ message: "Invalid request data" });
+exports.createTokenForNotification= asyncHandler(async(req, res)=> {
+    const { email, token } = req.body;
+  
+      const  result = await Admin.findOne({ email });
+    const update = await Admin.findByIdAndUpdate(result._id, {fcmToken:token})
+      res.status(200).json({ message: 'Token registered successfully' });
+
+})
+
+
+
+const sendPushNotification = async (token, message) => {
+    // Check if token is valid before proceeding
+    if (!token) {
+      console.log("Invalid FCM Token");
+      return;
     }
-    
-    const result = await Admin.findOne({ email })
+  
+    const messagePayload = {
+      notification: {
+        title: 'Login Attempt Detected',
+        body: message, // The message to be shown
+      },
+      token, // The device token where the notification is sent
+      data: {
+        type: 'loginAttempt',  // Custom data to identify the type of notification
+        message,
+      },
+    };
+  
+    try {
+      const response = await firebaseAdmin.messaging().send(messagePayload);
+      console.log('Successfully sent message:', response);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  };
+  
+
+
+  exports.mobileLoginResponse = asyncHandler(async (req, res) => {
+    const { accept, email } = req.body;
+  
+    // Validate request data
+    if (accept === undefined || !email) {
+      return res.status(400).json({ message: "Invalid request data" });
+    }
+  
+    // Find the admin user by email
+    const result = await Admin.findOne({ email });
+  
+    if (!result) {
+      return res.status(404).json({ message: 'Admin not found' });
+    }
+  
     if (accept) {
-        const token = jwt.sign( { adminId: result._id },  process.env.JWT_KEY, { expiresIn: "1d" } )
+      // Generate JWT token for the admin
+      const token = jwt.sign({ adminId: result._id }, process.env.JWT_KEY, { expiresIn: "1d" });
+  
+      // Check if user has FCM token
+      const fcmToken = result.fcmToken;
+      
+      if (fcmToken) {
+        const message = 'Someone is trying to log in to your account. If this wasn’t you, please secure your account.';
         
-        // res.cookie("admin", token, {maxAge: 86400000,httpOnly: true});
-       
-        //   console.log("eccepted");
+        // Send push notification if FCM token exists
+        await sendPushNotification(fcmToken, message);
         
-        req.io.emit("loginApproved", { success: true, result:{result, token} });
-      return res.json({ message: "Login approved" });
+        // Emit login approved event and return response
+        req.io.emit("loginApproved", { success: true, result: { result, token } });
+        return res.json({ message: "Login approved" });
+      } else {
+        // Log if FCM token is not found
+        console.log('No FCM token found for user');
+        
+        // Emit login approved event without notification
+        req.io.emit("loginApproved", { success: true, result: { result, token } });
+        return res.json({ message: "Login approved, but no FCM token found" });
+      }
     } else {
-        req.io.emit("loginRejected", { success: false });
-        // console.log("Rejected");
+      // Emit login rejected event if login is not accepted
+      req.io.emit("loginRejected", { success: false });
       return res.json({ message: "Login rejected" });
     }
   });

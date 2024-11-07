@@ -2,6 +2,7 @@ const express = require("express")
 const mongoose = require("mongoose")
 const cors = require("cors")
 const fs = require("fs")
+const firebaseAdmin = require('firebase-admin');
 const path = require("path")
 const socketIO = require("socket.io")
 const http = require("http")
@@ -15,6 +16,9 @@ const AdminSocketId = require("./models/AdminSocketId")
 
 require("dotenv").config()
 
+firebaseAdmin.initializeApp({
+  credential: firebaseAdmin.credential.cert(require('./firebase-admin-sdk.json')),
+});
 const app = express()
 const server = http.createServer(app)
 
