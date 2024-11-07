@@ -14,7 +14,7 @@ const { userProtected } = require("./middlewares/userProtected")
 const User = require("./models/User")
 const AdminSocketId = require("./models/AdminSocketId")
 
-require("dotenv").config()
+require("dotenv").config()        
 
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert(require('./firebase-admin-sdk.json')),
