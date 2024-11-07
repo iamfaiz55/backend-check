@@ -173,13 +173,13 @@ exports.mobileLoginResponse = asyncHandler(async (req, res) => {
     
     const result = await Admin.findOne({ email })
     if (accept) {
-      req.io.emit("loginApproved", { success: true, email });
-      const token = jwt.sign( { adminId: result._id },  process.env.JWT_KEY, { expiresIn: "1d" } )
-console.log("check token ", token);
-
-    res.cookie("admin", token, {maxAge: 86400000,httpOnly: true});
-    //   console.log("eccepted");
-      
+        const token = jwt.sign( { adminId: result._id },  process.env.JWT_KEY, { expiresIn: "1d" } )
+        console.log("check token ", token);
+        
+        res.cookie("admin", token, {maxAge: 86400000,httpOnly: true});
+        //   console.log("eccepted");
+        
+        req.io.emit("loginApproved", { success: true, result });
       return res.json({ message: "Login approved" });
     } else {
         req.io.emit("loginRejected", { success: false });
