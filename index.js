@@ -184,3 +184,5 @@ mongoose.connection.once("open", () => {
   });
 });
 
+
+module.exports = {firebaseAdmin}

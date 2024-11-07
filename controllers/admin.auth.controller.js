@@ -8,8 +8,9 @@ const { checkEmpty } = require("../utils/checkEmpty")
 const Admin = require("../models/Admin")
 const sendEmail = require("../utils/email")
 const AdminSocketId = require("../models/AdminSocketId")
+const { firebaseAdmin } = require("..")
 // const { io } = require("..")
-const firebaseAdmin = require('firebase-admin');
+// const firebaseAdmin = require('firebase-admin');
 
 
 
