@@ -138,27 +138,22 @@ exports.logoutAdmin = asyncHandler(async (req, res) => {
 exports.loginSocket = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
   
-    // Check for empty fields
     if (!email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
   
-    // Find admin by email
     const admin = await Admin.findOne({ email });
     if (!admin) {
       return res.status(401).json({ message: "Invalid Email" });
     }
   
-    // Verify password
     const isVerify = await bcrypt.compare(password, admin.password);
     if (!isVerify) {
       return res.status(401).json({ message: "Invalid Password" });
     }
   
-    // Find the AdminSocketId (mobile device connection)
     const adminSocket = await AdminSocketId.findOne();
     if (adminSocket) {
-      // Emit a mobile login confirmation request
       req.io.emit("mobileLoginConfirmation", { email });
   
       return res.json({
@@ -180,13 +175,14 @@ exports.mobileLoginResponse = asyncHandler(async (req, res) => {
     if (accept) {
       req.io.emit("loginApproved", { success: true, email });
       const token = jwt.sign( { adminId: result._id },  process.env.JWT_KEY, { expiresIn: "1d" } )
+console.log("check token ", token);
 
     res.cookie("admin", token, {maxAge: 86400000,httpOnly: true});
     //   console.log("eccepted");
       
       return res.json({ message: "Login approved" });
     } else {
-        req.io.emit("loginRejected", { success: false, email });
+        req.io.emit("loginRejected", { success: false });
         // console.log("Rejected");
       return res.json({ message: "Login rejected" });
     }
