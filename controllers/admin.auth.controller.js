@@ -8,7 +8,7 @@ const { checkEmpty } = require("../utils/checkEmpty")
 const Admin = require("../models/Admin")
 const sendEmail = require("../utils/email")
 const AdminSocketId = require("../models/AdminSocketId")
-// const { firebaseAdmin } = require("..")
+const { firebaseAdmin } = require("..")
 // const { io } = require("..")
 // const firebaseAdmin = require('firebase-admin');
 
@@ -177,32 +177,32 @@ exports.createTokenForNotification= asyncHandler(async(req, res)=> {
 
 
 
-// const sendPushNotification = async (token, message) => {
-//     // Check if token is valid before proceeding
-//     if (!token) {
-//       console.log("Invalid FCM Token");
-//       return;
-//     }
+const sendPushNotification = async (token, message) => {
+    // Check if token is valid before proceeding
+    if (!token) {
+      console.log("Invalid FCM Token");
+      return;
+    }
   
-//     const messagePayload = {
-//       notification: {
-//         title: 'Login Attempt Detected',
-//         body: message, // The message to be shown
-//       },
-//       token, // The device token where the notification is sent
-//       data: {
-//         type: 'loginAttempt',  // Custom data to identify the type of notification
-//         message,
-//       },
-//     };
+    const messagePayload = {
+      notification: {
+        title: 'Login Attempt Detected',
+        body: message, // The message to be shown
+      },
+      token, // The device token where the notification is sent
+      data: {
+        type: 'loginAttempt',  // Custom data to identify the type of notification
+        message,
+      },
+    };
   
-//     try {
-//       const response = await firebaseAdmin.messaging().send(messagePayload);
-//       console.log('Successfully sent message:', response);
-//     } catch (error) {
-//       console.error('Error sending message:', error);
-//     }
-//   };
+    try {
+      const response = await firebaseAdmin.messaging().send(messagePayload);
+      console.log('Successfully sent message:', response);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  };
   
 
 
