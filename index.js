@@ -36,7 +36,9 @@ app.use(express.json())
 app.use(express.static("dist"))
 app.use(
   cors({
-    origin: "*",
+    origin: (origin, callback) => {
+      callback(null, true);
+  },
     credentials: true,
   })
 );
