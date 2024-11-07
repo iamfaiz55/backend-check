@@ -175,12 +175,11 @@ exports.mobileLoginResponse = asyncHandler(async (req, res) => {
     if (accept) {
         const token = jwt.sign( { adminId: result._id },  process.env.JWT_KEY, { expiresIn: "1d" } )
         
-        res.cookie("admin", token, {maxAge: 86400000,httpOnly: true});
-        const {admin }= req.cookies
-        console.log("check cookie ",admin );
+        // res.cookie("admin", token, {maxAge: 86400000,httpOnly: true});
+       
         //   console.log("eccepted");
         
-        req.io.emit("loginApproved", { success: true, result });
+        req.io.emit("loginApproved", { success: true, result:{result, token} });
       return res.json({ message: "Login approved" });
     } else {
         req.io.emit("loginRejected", { success: false });
