@@ -68,16 +68,6 @@ exports.addProduct = asyncHandler(async (req, res) => {
     });
 });
 
-// exports.getVarient=  asyncHandler(async(req, res)=> {
-//     const {id} = req.params
-//     const result = await Product.findById({_id:id})
-//     console.log("result",result);
-//     console.log("id", id);
-    
-//     res.json({message:"VArient get Success", result})
-// })
-
-
 exports.updateProduct = asyncHandler(async (req, res) => {
     const { pUId } = req.params;
 
