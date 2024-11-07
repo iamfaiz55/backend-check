@@ -14,14 +14,6 @@ const { userProtected } = require("./middlewares/userProtected")
 const User = require("./models/User")
 const AdminSocketId = require("./models/AdminSocketId")
 
-require("dotenv").config()        
-
-const firebaseCredentialsPath = path.join(__dirname, "firebaseConfig.js");
-
-firebaseAdmin.initializeApp({
-  credential: firebaseAdmin.credential.cert(firebaseCredentialsPath),
-});
-
 const app = express()
 const server = http.createServer(app)
 
@@ -182,5 +174,3 @@ mongoose.connection.once("open", () => {
   });
 });
 
-
-module.exports = {firebaseAdmin}
