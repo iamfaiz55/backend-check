@@ -17,7 +17,7 @@ const AdminSocketId = require("./models/AdminSocketId")
 require("dotenv").config()        
 
 // Read Firebase credentials JSON file
-const firebaseCredentialsPath = path.join(__dirname, "firebaseConfig.js");
+const firebaseCredentialsPath = path.join(__dirname, "firebaseConfig.json");
 const firebaseCredentials = JSON.parse(fs.readFileSync(firebaseCredentialsPath, "utf-8"));
 
 firebaseAdmin.initializeApp({
